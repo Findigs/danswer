@@ -10,7 +10,9 @@ export interface AuthTypeMetadata {
 }
 
 export const getAuthTypeMetadataSS = async (): Promise<AuthTypeMetadata> => {
+  console.log(buildUrl("/auth/type"));
   const res = await fetch(buildUrl("/auth/type"));
+  console.log(res);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -41,7 +43,9 @@ const geOIDCAuthUrlSS = async (): Promise<string> => {
 };
 
 const getGoogleOAuthUrlSS = async (): Promise<string> => {
+  console.log(buildUrl("/auth/oauth/authorize"));
   const res = await fetch(buildUrl("/auth/oauth/authorize"));
+  console.log(res);
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
