@@ -6,7 +6,12 @@ from pathlib import Path
 from typing import Any
 from typing import IO
 
+from cloudstorage.drivers.amazon import S3Driver
+
 from danswer.configs.app_configs import INDEX_BATCH_SIZE
+from danswer.configs.app_configs import AWS_ACCESS_KEY_ID
+from danswer.configs.app_configs import AWS_SECRET_ACCESS_KEY
+from danswer.configs.app_configs import AWS_DEFAULT_REGION
 from danswer.configs.constants import DocumentSource
 from danswer.connectors.cross_connector_utils.file_utils import detect_encoding
 from danswer.connectors.cross_connector_utils.file_utils import load_files_from_zip
@@ -23,6 +28,22 @@ from danswer.utils.logger import setup_logger
 
 
 logger = setup_logger()
+
+storage = S3Driver(
+    key=AWS_ACCESS_KEY_ID,
+    secret=AWS_SECRET_ACCESS_KEY,
+    region=AWS_DEFAULT_REGION,
+)
+container = storage.get_container("danswer")
+
+
+def _download_blobs_to_location(file_path: str | Path):
+    if isinstance(file_path, str):
+        file_path = Path(file_path)
+
+    blob_name = "_".join(file_path.parts[-2:])
+    file = container.get_blob(blob_name)
+    file.download(file_path.absolute())
 
 
 def _open_files_at_location(
@@ -125,6 +146,7 @@ class LocalFileConnector(LoadConnector):
         documents: list[Document] = []
         for file_location in self.file_locations:
             current_datetime = datetime.now(timezone.utc)
+            _download_blobs_to_location(file_location)
             files = _open_files_at_location(file_location)
 
             for file_name, file, metadata in files:

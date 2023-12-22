@@ -14,6 +14,9 @@ APP_PORT = 8080
 # prefix from requests directed towards the API server. In these cases, set this to `/api`
 APP_API_PREFIX = os.environ.get("API_PREFIX", "")
 
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
+AWS_DEFAULT_REGION = os.environ.get("AWS_DEFAULT_REGION", "")
 
 #####
 # User Facing Features Configs

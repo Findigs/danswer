@@ -12,7 +12,7 @@ RUN echo "DANSWER_VERSION: ${DANSWER_VERSION}"
 # zip for Vespa step futher down
 # ca-certificates for HTTPS
 RUN apt-get update && \
-    apt-get install -y cmake curl zip ca-certificates && \
+    apt-get install -y cmake curl zip ca-certificates libmagic-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -21,8 +21,7 @@ RUN apt-get update && \
 COPY ./requirements/default.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /tmp/requirements.txt && \
     pip uninstall -y py && \
-    playwright install chromium && playwright install-deps chromium && \
-    ln -s /usr/local/bin/supervisord /usr/bin/supervisord
+    playwright install chromium && playwright install-deps chromium
 
 # Cleanup for CVEs and size reduction
 # https://github.com/tornadoweb/tornado/issues/3107
