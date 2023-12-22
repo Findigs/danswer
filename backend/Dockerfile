@@ -9,7 +9,7 @@ RUN echo "DANSWER_VERSION: ${DANSWER_VERSION}"
 RUN apt-get update && \
     apt-get install -y git cmake pkg-config libprotobuf-c-dev protobuf-compiler \
        libprotobuf-dev libgoogle-perftools-dev libpq-dev build-essential cron curl \
-       supervisor zip ca-certificates gnupg && \
+       supervisor zip ca-certificates gnupg libmagic-dev && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 

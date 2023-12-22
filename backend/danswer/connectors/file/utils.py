@@ -6,9 +6,24 @@ from pathlib import Path
 from typing import Any
 from typing import IO
 
+from cloudstorage.drivers.amazon import S3Driver
+
 from danswer.configs.app_configs import FILE_CONNECTOR_TMP_STORAGE_PATH
+from danswer.configs.app_configs import AWS_ACCESS_KEY_ID
+from danswer.configs.app_configs import AWS_SECRET_ACCESS_KEY
+from danswer.configs.app_configs import AWS_DEFAULT_REGION
+from danswer.utils.logger import setup_logger
+
+logger = setup_logger()
 
 _VALID_FILE_EXTENSIONS = [".txt", ".zip", ".pdf", ".md", ".mdx"]
+
+storage = S3Driver(
+    key=AWS_ACCESS_KEY_ID,
+    secret=AWS_SECRET_ACCESS_KEY,
+    region=AWS_DEFAULT_REGION,
+)
+container = storage.get_container("danswer")
 
 
 def get_file_ext(file_path_or_name: str | Path) -> str:
@@ -29,7 +44,8 @@ def write_temp_files(
     NOTE: need to pass in (file_name, File) tuples since FastAPI's `UploadFile` class
     exposed SpooledTemporaryFile does not include a name.
     """
-    file_location = Path(base_path) / str(uuid.uuid4())
+    file_uuid = str(uuid.uuid4())
+    file_location = Path(base_path) / file_uuid
     os.makedirs(file_location, exist_ok=True)
 
     file_paths: list[str] = []
@@ -44,9 +60,11 @@ def write_temp_files(
         with open(file_path, "wb") as buffer:
             # copy file content from uploaded file to the newly created file
             shutil.copyfileobj(file, buffer)
+            # write to S3Driver
+            file.seek(0)
+            container.upload_blob(file, blob_name=file_uuid + "_" + file_name)
 
         file_paths.append(str(file_path.absolute()))
-
     return file_paths
 
 
