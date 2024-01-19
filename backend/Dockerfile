@@ -21,7 +21,8 @@ RUN apt-get update && \
 COPY ./requirements/default.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /tmp/requirements.txt && \
     pip uninstall -y py && \
-    playwright install chromium && playwright install-deps chromium
+    playwright install chromium && playwright install-deps chromium && \
+    ln -s /usr/local/bin/supervisord /usr/bin/supervisord
 
 # Cleanup for CVEs and size reduction
 # https://github.com/tornadoweb/tornado/issues/3107
